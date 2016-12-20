@@ -9,23 +9,24 @@ It is thus crucial that the CNN does not merely memorize the first track, but ge
 The main problem lies in the skew of the data set: most of the time the steering angle during normal driving is small or zero, but the most important events occur when the car needs to turn sharply. Without accounting for this skew in the data set the car tends to drive straight most of the time and thus leaves the track quickly. One way to counteract this problem is to  purposely let the car drift  towards the side of the road and to start recovery in the very last moment. 
 However, the correct steering angles are not easy to generate this way, because even then most of the time the car drives straight, with the exception of the short moment when the driver avoids a crash or the car going off the road. 
 
-We therefore decided on a different recovery strategy. To train the car we drove as smoothly as possible right in the middle of the road for 3-4 laps in one direction. Instead of manually recovering the car we simulated  recovery events by transforming the images (shifts,shears,crops,brightness,flips) obtained from the training data with corresponding steering angle changes.
 
 # Model architecture
 CNNs architectures have been successfully used to predict the steering angle of the simulator. 
 Among these are the CNN architecture of NVIDIA https://arxiv.org/pdf/1604.07316v1.pdf or the comma.ai architecture 
-https://github.com/commaai/research which were used successfully, e.g. in the submission of https://github.com/diyjac/SDC-P3.
+https://github.com/commaai/research which were used successfully, e.g. in the submission of https://github.com/diyjac/SDC-P3 and 
+https://github.com/diyjac/SDC-P3/.  In https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.4iywd3mzj the author provided a solution to this steering problem based on the judicious use of data augmentation. This submission draws on the insights obtained there but differs in the network architecture and augmentation techniques. 
 
-In both architectures a single variable is predicted, the current steering angle as a real valued number. The problem is thus not a classification but a regression task and we will follow the same approach (it would be interesting though to see how a discretized version performs).
+In all of the above architectures a single variable -- the current steering angle -- is predicted as a real valued number. The problem is thus not a classification but a regression task.  We will build a similar architecture that predicts a single real valued number, but it would be interesting to see how a discretized version performs. 
 
-In https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.4iywd3mzj the author provided a solution 
-to this steering problem based on the judicious use of data augmentation. This submission draws on the insights obtained there 
-but differs in the network architecture and augmentation techniques. 
 
-For the network architecture we use a CNN that evolved from a previous submiossion for classfying traffic signs https://github.com/ksakmann/CarND-TrafficSignClassifier but with some changes. 
-The network starts with a preprocessing layer that takes in images of shape 64x64x3. The image gets normalized to the range [-1,1] otherwise no preprocessing is performed. Following the input layer are 4 convolutional layers with ReLU activations. The first two layers employ kernels of size k=(8,8) with a stride of s=(4,4) and 32 and 64 channels, respectively. The next convolutional layer uses k=(4,4) kernels, a stride of s=(2,2) and 128 channels. In the last convolutional layer we use k=(2,2), a stride s=(1,1) and again 128 channels. Following the convolutional layers are two fully connected layers  with ReLU activations as well as dropout regularization right before the layers. The final layer is a single neuron that provides the predicted steering angle. We explicitly avoided the use of pooling layers because pooling layers apart from down sampling also provide (some) shift invariance, which is desirable for classification tasks, but is counterproductive for keeping a car centered on the road (note: the comma.ai architecture does not use pooling either).
+For the network architecture we draw on a CNN that evolved from a previous submission for classfying traffic signs https://github.com/ksakmann/CarND-TrafficSignClassifier with high (97.8%) accuracy. However, we included some crucial changes. 
 
-The training images are generated on the fly from a data set gathered few rounds driving around the track in one direction, trying to stay as centered as possible. During training a python generator creates new images with accordingly corrected steering angles. The operations performed  are 
+The network starts with a preprocessing layer that takes in images of shape 64x64x3. Each image gets normalized to the range [-1,1] otherwise no preprocessing is performed. Following the input layer are 4 convolutional layers. ReLU activations are used throughout the whole network. The first two convolutional layers employ kernels of size k=(8,8) with a stride of s=(4,4) and 32 and 64 channels, respectively. The next convolutional layer uses k=(4,4) kernels, a stride of s=(2,2) and 128 channels. In the last convolutional layer we use k=(2,2), a stride s=(1,1) and again 128 channels. Following the convolutional layers are two fully connected layers  with ReLU activations as well as dropout regularization right before the layers. The final layer is a single neuron that provides the predicted steering angle. We explicitly avoided the use of pooling layers because pooling layers apart from down sampling also provide (some) shift invariance, which is desirable for classification tasks, but is counterproductive for keeping a car centered on the road (note: the comma.ai architecture does not use pooling either).
+
+
+
+# Training
+Due to the problems with generating the important recovery events manually we decided on an augmentation strategy. The raw training data was gathered by driving the car as smoothly as possible right in the middle of the road for 3-4 laps in one direction. We simulated  recovery events by transforming (shifts, shears, crops, brightness, flips) the recorded images using library functions from OpenCV  with corresponding steering angle changes. The final training images are then generated in batches of 200 on the fly with 20000 images per epoch. A python generator creates new training batches by applying the aforementioned transformations with accordingly corrected steering angles. The operations performed  are 
 
 0. A random training example is chosen
 1. The camera (left,right,center) is chosen randomly
@@ -34,10 +35,23 @@ The training images are generated on the fly from a data set gathered few rounds
 4. Random flip: to make sure left and right turns occur just as frequently 
 5. Random brightness: to simulate differnt lighting conditions
 
-In steps 1-4 the steering angle is adjusted to account for the change of the image.
+In steps 1-4 the steering angle is adjusted to account for the change of the image. The chaining of these operations leads to a practically infinite number of different training examples.
 
-# Training
-We used validation sets for checking against overfitting, but with the generator producing an almost infinite number of training examples we eventually switched to simply testing teh performance of the network on the curvy test track that the car had never seen. We used an Adam optimizer for training. All training was performed at the fastest graphics setting.
+The steering angle changes corresponding to each of the above operations was determined manually by investigating the result of each transformation and using trigonometry. For example the angle correction corresponding to a horizontal shearing transformation should 
+be proportional to shearing angle. 
+
+
+# Epochs and Validation
+Initially we kept a validation set for checking against overfitting by comparing training and validation loss. However, after introduction of the generator and the corresponding rapid performance increase we eventually switched to testing the performance of the network by letting it drive on the test track. We used an Adam optimizer for training. All training was performed at the fastest graphics setting. 
+
+# Results
+Surprisingly, the car went around the training track almost immediately after 
+
+
+
+
+
+
 
 
 
