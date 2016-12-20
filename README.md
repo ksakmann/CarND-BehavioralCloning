@@ -42,7 +42,7 @@ The network starts with a preprocessing layer that takes in images of shape 64x6
 | dropout_2 (Dropout)             | (None, 128)        |   0          | activation_4[0][0]               
 | dense_2 (Dense)                |  (None, 128)       |    16512      | dropout_2[0][0]                  
 | dense_3 (Dense)                |  (None, 1)        |     129        | dense_2[0][0]                    
-|--------------------------------|-------------------|----------------|---------------------- 
+||||
 | Total params: 416481
 
 
@@ -70,9 +70,14 @@ be proportional to shearing angle.
 Initially we kept a validation set for checking against overfitting by comparing training and validation loss. However, after introduction of the generator and the corresponding rapid performance increase we eventually switched to testing the performance of the network by letting it drive on the test track. We used an Adam optimizer for training. All training was performed at the fastest graphics setting. 
 
 # Results
-Surprisingly, the car went around the training track almost immediately after 
+Surprisingly, the car went around the training track almost immediately after introducing the generator. However, it was not reactive enough to complete the test track. Tuning the parameters of the angle correction in the augmentation section of teh code and retraining the network for about 10 epochs fixed the issue and the car mastered the test track. A video of the test track performance is shown here. 
 
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=5BTIE_fhReo
+" target="_blank"><img src="http://img.youtube.com/vi/5BTIE_fhReo/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
 
+# Conclusions
+By making consequent use of image augmentation with according steering angle updates we could train a neural network to recover the car from extreme events, like suddenly appearing curves change of lighting conditions by exclusively simulating such events from regular driving data. 
 
 
 
