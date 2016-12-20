@@ -17,8 +17,8 @@ matplotlib.style.use('ggplot')
 
 data_dir = './data/mydata'
 data_csv = '/driving_log.csv'
-model_json = 'model2.json'
-model_weights = 'model2.h5'
+model_json = 'model.json'
+model_weights = 'model.h5'
 
 #col_names = ['center', 'left','right','steering','throttle','brake','speed']
 training_dat = pd.read_csv(data_dir+data_csv,names=None)
