@@ -42,7 +42,7 @@ The network starts with a preprocessing layer that takes in images of shape 64x6
 | dropout_2 (Dropout)             | (None, 128)        |   0          | activation_4[0][0]               
 | dense_2 (Dense)                |  (None, 128)       |    16512      | dropout_2[0][0]                  
 | dense_3 (Dense)                |  (None, 1)        |     129        | dense_2[0][0]                    
-|--------------------------------|-------------------|----------------|---------------------- 
+||||
 | Total params: 416481
 
 
