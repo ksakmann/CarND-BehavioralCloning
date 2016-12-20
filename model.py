@@ -17,8 +17,8 @@ matplotlib.style.use('ggplot')
 
 data_dir = './data/mydata'
 data_csv = '/driving_log.csv'
-model_json = 'model_behavioral_cloning_augmentation.json'
-model_weights = 'model_behavioral_cloning_augmentation.h5'
+model_json = 'model2.json'
+model_weights = 'model2.h5'
 
 #col_names = ['center', 'left','right','steering','throttle','brake','speed']
 training_dat = pd.read_csv(data_dir+data_csv,names=None)
@@ -45,18 +45,18 @@ def read_next_image(m,lcr,X_train,X_left,X_right,Y_train):
     # should be be corrected over the next dist meters, calculate the change in steering control
     # using tan(alpha)=alpha
 
-    offset=1.2 
-    dist=20.0
+    offset=1.0 
+    dist=10.0
     steering = Y_train[m]
     if lcr == 0:
         image = plt.imread(X_left[m].replace(' ',''))
-        dsteering = -offset/dist * 360/( 2*np.pi) / 25.0
+        dsteering = offset/dist * 360/( 2*np.pi) / 25.0
         steering += dsteering
     elif lcr == 1:
         image = plt.imread(X_train[m].replace(' ',''))
     elif lcr == 2:
         image = plt.imread(X_right[m].replace(' ',''))
-        dsteering = offset/dist * 360/( 2*np.pi)  / 25.0
+        dsteering = -offset/dist * 360/( 2*np.pi)  / 25.0
         steering += dsteering
     else:
         print ('Invalid lcr value :',lcr )
@@ -104,7 +104,7 @@ def random_shear(image,steering,shear_range):
 
 def random_brightness(image):
     image1 = cv2.cvtColor(image,cv2.COLOR_RGB2HSV)
-    random_bright = 1.0 + 0.2*(2*np.random.uniform()-1.0)    
+    random_bright = 0.8 + 0.4*(2*np.random.uniform()-1.0)    
     image1[:,:,2] = image1[:,:,2]*random_bright
     image1 = cv2.cvtColor(image1,cv2.COLOR_HSV2RGB)
     return image1
@@ -120,16 +120,16 @@ def generate_training_example(X_train,X_left,X_right,Y_train):
     m = np.random.randint(0,len(Y_train))
 #    print('training example m :',m)
     lcr = np.random.randint(0,3)
-    lcr = 1
+    #lcr = 1
 #    print('left_center_right  :',lcr)
     image,steering = read_next_image(m,lcr,X_train,X_left,X_right,Y_train)
 #    print('steering :',steering)
 #    plt.imshow(image)
-    image,steering = random_shear(image,steering,shear_range=80)
+    image,steering = random_shear(image,steering,shear_range=100)
 #    print('steering :',steering)
 #    plt.figure()
 #    plt.imshow(image)    
-    image,steering = random_crop(image,steering,tx_lower=-20,tx_upper=20,ty_lower=-2,ty_upper=2)
+    image,steering = random_crop(image,steering,tx_lower=-20,tx_upper=20,ty_lower=-10,ty_upper=10)
 #    print('steering :',steering)
 #    plt.figure()
 #    plt.imshow(image)
@@ -174,15 +174,12 @@ model = Sequential()
 model.add(Lambda(lambda x: x/127.5 - 1.0,input_shape=(64,64,3)))
 model.add(Convolution2D(32, 8,8 ,border_mode='same', subsample=(4,4)))
 model.add(Activation('relu'))
-#model.add(MaxPooling2D(pool_size=(2,2),strides=(1,1)))
 model.add(Convolution2D(64, 8,8 ,border_mode='same',subsample=(4,4)))
 model.add(Activation('relu',name='relu2'))
-#model.add(MaxPooling2D(pool_size=(2,2)))
 model.add(Convolution2D(128, 4,4,border_mode='same',subsample=(2,2)))
 model.add(Activation('relu'))
 model.add(Convolution2D(128, 2,2,border_mode='same',subsample=(1,1)))
 model.add(Activation('relu'))
-#model.add(MaxPooling2D(pool_size=(2,2)))
 model.add(Flatten())
 model.add(Dropout(0.5))
 model.add(Dense(128))
@@ -209,7 +206,7 @@ if os.path.isfile(model_json) and restart:
 model.compile(optimizer=adam, loss='mse')
 
 
-nb_epoch=1000
+nb_epoch=10
 history = model.fit_generator(train_generator,
                     samples_per_epoch=20000, nb_epoch=nb_epoch,
                     verbose=1)
