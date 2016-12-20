@@ -21,8 +21,7 @@ but differs in the network architecture and augmentation techniques.
 For the network architecture we use a CNN that evolved from a previous submiossion for classfying traffic signs https://github.com/ksakmann/CarND-TrafficSignClassifier but with some changes. 
 The network starts with a preprocessing layer that takes in images of shape 64x64x3. The image gets normalized to the range [-1,1] otherwise no preprocessing is performed. Following the input layer are 4 convolutional layers with ReLU activations. The first two layers employ kernels of size k=(8,8) with a stride of s=(4,4) and 32 and 64 channels, respectively. The next convolutional layer uses k=(4,4) kernels, a stride of s=(2,2) and 128 channels. In the last convolutional layer we use k=(2,2), a stride s=(1,1) and again 128 channels. Following the convolutional layers are two fully connected layers  with ReLU activations as well as dropout regularization right before the layers. The final layer is a single neuron that provides the predicted steering angle. We explicitly avoided the use of pooling layers because pooling layers apart from down sampling also provide (some) shift invariance, which is desirable for classification tasks, but is counterproductive for keeping a car centered on the road (note: the comma.ai architecture does not use pooling either).
 
-The training images are generated on the fly from a data set gathered few rounds driving around the track in one direction.
-During training a python generator creates new images with accordingly corrected steering angles. The operations performed  are 
+The training images are generated on the fly from a data set gathered few rounds driving around the track in one direction, trying to stay as centered as possible. During training a python generator creates new images with accordingly corrected steering angles. The operations performed  are 
 
 0. A random training example is chosen
 1. The camera (left,right,center) is chosen randomly
@@ -32,3 +31,9 @@ During training a python generator creates new images with accordingly corrected
 5. Random brightness: to simulate differnt lighting conditions
 
 In steps 1-4 the steering angle is adjusted to account for the change of the image.
+
+# Training
+We used validation sets for checking against overfitting, but with the generator producing an almost infinite number of training examples we eventually switched to simply testing teh performance of the network on the curvy test track that the car had never seen. We used an Adam optimizer for training. All training was performed at the fastest graphics setting.
+
+
+
