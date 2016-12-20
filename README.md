@@ -24,41 +24,25 @@ For the network architecture we draw on a CNN that evolved from a previous submi
 The network starts with a preprocessing layer that takes in images of shape 64x64x3. Each image gets normalized to the range [-1,1] otherwise no preprocessing is performed. Following the input layer are 4 convolutional layers. ReLU activations are used throughout the whole network. The first two convolutional layers employ kernels of size k=(8,8) with a stride of s=(4,4) and 32 and 64 channels, respectively. The next convolutional layer uses k=(4,4) kernels, a stride of s=(2,2) and 128 channels. In the last convolutional layer we use k=(2,2), a stride s=(1,1) and again 128 channels. Following the convolutional layers are two fully connected layers  with ReLU activations as well as dropout regularization right before the layers. The final layer is a single neuron that provides the predicted steering angle. We explicitly avoided the use of pooling layers because pooling layers apart from down sampling also provide (some) shift invariance, which is desirable for classification tasks, but is counterproductive for keeping a car centered on the road (note: the comma.ai architecture does not use pooling either).
 
 
-____________________________________________________________________________________________________
 |Layer (type)                    | Output Shape      |    Param #   |  Connected to                     
-====================================================================================================
+---------------------------------------------------------------------------------------------
 |lambda_1 (Lambda)               | (None, 64, 64, 3) |    0          | lambda_input_1[0][0]             
-____________________________________________________________________________________________________
 |convolution2d_1 (Convolution2D) | (None, 16, 16, 32)  |  6176        | lambda_1[0][0]                   
-____________________________________________________________________________________________________
 |activation_1 (Activation)     |   (None, 16, 16, 32)   | 0           | convolution2d_1[0][0]            
-____________________________________________________________________________________________________
 | convolution2d_2 (Convolution2D) |  (None, 4, 4, 64)     | 131136    |  activation_1[0][0]               
-____________________________________________________________________________________________________
 | relu2 (Activation)              | (None, 4, 4, 64)     | 0          | convolution2d_2[0][0]            
-____________________________________________________________________________________________________
 | convolution2d_3 (Convolution2D) | (None, 2, 2, 128)    | 131200     | relu2[0][0]                      
-____________________________________________________________________________________________________
 |activation_2 (Activation)       | (None, 2, 2, 128)    | 0          | convolution2d_3[0][0]            
-____________________________________________________________________________________________________
 |convolution2d_4 (Convolution2D) | (None, 2, 2, 128)    | 65664      | activation_2[0][0]               
-____________________________________________________________________________________________________
 |activation_3 (Activation)       | (None, 2, 2, 128)    | 0          | convolution2d_4[0][0]            
-____________________________________________________________________________________________________
 |flatten_1 (Flatten)          |    (None, 512)          | 0          | activation_3[0][0]               
-____________________________________________________________________________________________________
 |dropout_1 (Dropout)           |   (None, 512)          | 0          | flatten_1[0][0]                  
-____________________________________________________________________________________________________
 |dense_1 (Dense)                |  (None, 128)          | 65664      | dropout_1[0][0]                  
-____________________________________________________________________________________________________
 |activation_4 (Activation)       | (None, 128)         |  0          | dense_1[0][0]                    
-____________________________________________________________________________________________________
 |dropout_2 (Dropout)             | (None, 128)        |   0          | activation_4[0][0]               
-____________________________________________________________________________________________________
 |dense_2 (Dense)                |  (None, 128)       |    16512      | dropout_2[0][0]                  
-____________________________________________________________________________________________________
 |dense_3 (Dense)                |  (None, 1)        |     129        | dense_2[0][0]                    
-====================================================================================================
+---------------------------------------------------------------------------------------------
 |Total params: 416481
 
 
