@@ -25,7 +25,7 @@ The network starts with a preprocessing layer that takes in images of shape 64x6
 
 
 | Layer (type)                    | Output Shape      |    Param #   |  Connected to                     
----------------------------------------------------------------------------------------------
+|--------------------------------------------------------------------------------------------
 | lambda_1 (Lambda)               | (None, 64, 64, 3) |    0          | lambda_input_1[0][0]             
 | convolution2d_1 (Convolution2D) | (None, 16, 16, 32)  |  6176        | lambda_1[0][0]                   
 | activation_1 (Activation)     |   (None, 16, 16, 32)   | 0           | convolution2d_1[0][0]            
@@ -42,7 +42,7 @@ The network starts with a preprocessing layer that takes in images of shape 64x6
 | dropout_2 (Dropout)             | (None, 128)        |   0          | activation_4[0][0]               
 | dense_2 (Dense)                |  (None, 128)       |    16512      | dropout_2[0][0]                  
 | dense_3 (Dense)                |  (None, 1)        |     129        | dense_2[0][0]                    
----------------------------------------------------------------------------------------------
+|--------------------------------------------------------------------------------------------
 | Total params: 416481
 
 
