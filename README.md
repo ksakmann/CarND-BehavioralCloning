@@ -6,7 +6,7 @@ The simulated car is equipped with three cameras, one to the left, one in the ce
 
 The main problem lies in the skew of the data set: most of the time the steering angle during normal driving is small or zero, but the most important events occur when the car needs to turn sharply. Shown below is a histogram of the steering angles recorded while driving in the middle of the road for a few laps (this is also the data used for training).  
 
-![Recorded steering angles](https://github.com/ksakmann/CarND-BehavioralCloning/raw_steering_angles.png).
+![Recorded steering angles](https://github.com/ksakmann/CarND-BehavioralCloning/blob/master/raw_steering_angles.png).
 
 Without accounting for this skew in the data set the car tends to drive straight most of the time and thus leaves the track quickly. One way to counteract this problem is to  purposely let the car drift  towards the side of the road and to start recovery in the very last moment. 
 However, the correct large steering angles are not easy to generate this way, because even then most of the time the car drives straight, with the exception of the short moment when the driver avoids a crash or the car going off the road. 
