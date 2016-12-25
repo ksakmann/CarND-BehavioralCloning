@@ -4,11 +4,13 @@ In this project for the Udacity Self-Driving Car Nanodegree a deep CNN  is devel
 # General considerations.
 The simulated car is equipped with three cameras, one to the left, one in the center and one to the right of the driver that provide images from these different view points. The training track has sharp corners, exits, entries, bridges, partially missing lane lines and changing light conditions. An additional test track exists with changing elevations, even sharper turns and bumps. It is thus crucial that the CNN does not merely memorize the first track, but generalizes to unseen data in order to perform well on the test track. The model developed here was trained exclusively on the training track and completes the test track.
 
-The main problem lies in the skew of the data set: most of the time the steering angle during normal driving is small or zero, but the most important events occur when the car needs to turn sharply. Shown below is a histogram of the steering angles recorded while driving in the middle of the road for a few laps (this is also the data used for training).  
+The main problem lies in the skew and bias of the data set. Shown below is a histogram of the steering angles recorded while driving in the middle of the road for a few laps. This is also the data used for training. The left-right skew is less problematic and can be eliminated by flipping images and steering angles simultaneously. However, even after balancing left and right angles most of the time the steering angle during normal driving is small or zero and thus introduces a bias towards driving straight. The most important events however are those when the car needs to turn sharply. 
 
-![Recorded steering angles](https://github.com/ksakmann/CarND-BehavioralCloning/blob/master/raw_steering_angles.png).
+<p align="center">
+  <img src="https://github.com/ksakmann/CarND-BehavioralCloning/blob/master/raw_steering_angles.png?raw=true" alt="Recorded steering angles"/>
+</p>
 
-Without accounting for this skew in the data set the car tends to drive straight most of the time and thus leaves the track quickly. One way to counteract this problem is to  purposely let the car drift  towards the side of the road and to start recovery in the very last moment. 
+Without accounting for this bias towards zero, the car leaves the track quickly. One way to counteract this problem is to  purposely let the car drift  towards the side of the road and to start recovery in the very last moment. 
 However, the correct large steering angles are not easy to generate this way, because even then most of the time the car drives straight, with the exception of the short moment when the driver avoids a crash or the car going off the road. 
 
 
