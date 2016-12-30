@@ -2,12 +2,16 @@
 In this project for the Udacity Self-Driving Car Nanodegree a deep CNN  is developed that can steer a car in a simulator provided by Udacity. The CNN drives the car autonomously around a track. The network is trained on images from a video stream that was recorded while a human was steering the car. The CNN thus clones the human driving behavior.
 
 # General considerations.
-The simulated car is equipped with three cameras, one to the left, in the center and one to the right of the driver that provide images from these different view points. The training track has sharp corners, exits, entries, bridges, partially missing lane lines 
-and changing light conditions. An additional test track exists with changing elevations, even sharper turns and bumps.
-It is thus crucial that the CNN does not merely memorize the first track, but generalizes to unseen data in order to perform well on the test track. The model developed here was trained exclusively on the trainnig track and completes the test track.
+The simulated car is equipped with three cameras, one to the left, one in the center and one to the right of the driver that provide images from these different view points. The training track has sharp corners, exits, entries, bridges, partially missing lane lines and changing light conditions. An additional test track exists with changing elevations, even sharper turns and bumps. It is thus crucial that the CNN does not merely memorize the first track, but generalizes to unseen data in order to perform well on the test track. The model developed here was trained exclusively on the training track and completes the test track.
 
-The main problem lies in the skew of the data set: most of the time the steering angle during normal driving is small or zero, but the most important events occur when the car needs to turn sharply. Without accounting for this skew in the data set the car tends to drive straight most of the time and thus leaves the track quickly. One way to counteract this problem is to  purposely let the car drift  towards the side of the road and to start recovery in the very last moment. 
-However, the correct steering angles are not easy to generate this way, because even then most of the time the car drives straight, with the exception of the short moment when the driver avoids a crash or the car going off the road. 
+The main problem lies in the skew and bias of the data set. Shown below is a histogram of the steering angles recorded while driving in the middle of the road for a few laps. This is also the data used for training. The left-right skew is less problematic and can be eliminated by flipping images and steering angles simultaneously. However, even after balancing left and right angles most of the time the steering angle during normal driving is small or zero and thus introduces a bias towards driving straight. The most important events however are those when the car needs to turn sharply. 
+
+<p align="center">
+  <img src="https://github.com/ksakmann/CarND-BehavioralCloning/blob/master/raw_steering_angles.png?raw=true" alt="Recorded steering angles"/>
+</p>
+
+Without accounting for this bias towards zero, the car leaves the track quickly. One way to counteract this problem is to  purposely let the car drift  towards the side of the road and to start recovery in the very last moment. 
+However, the correct large steering angles are not easy to generate this way, because even then most of the time the car drives straight, with the exception of the short moment when the driver avoids a crash or the car going off the road. 
 
 
 # Model architecture
@@ -47,10 +51,8 @@ The network starts with a preprocessing layer that takes in images of shape 64x6
 
 
 
-
-
-
 # Training
+All computations were run on an Ubuntu 16.04 system with an Intel i7 processor and an NVIDIA GTX 1080.  
 Due to the problems with generating the important recovery events manually we decided on an augmentation strategy. The raw training data was gathered by driving the car as smoothly as possible right in the middle of the road for 3-4 laps in one direction. We simulated  recovery events by transforming (shifts, shears, crops, brightness, flips) the recorded images using library functions from OpenCV  with corresponding steering angle changes. The final training images are then generated in batches of 200 on the fly with 20000 images per epoch. A python generator creates new training batches by applying the aforementioned transformations with accordingly corrected steering angles. The operations performed  are 
 
 0. A random training example is chosen
@@ -75,6 +77,14 @@ Surprisingly, the car went around the training track almost immediately after in
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=5BTIE_fhReo
 " target="_blank"><img src="http://img.youtube.com/vi/5BTIE_fhReo/0.jpg" 
 alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
+
+The performance of the same CNN on the training track is shown below.  
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=DyQkdoPNsYY
+" target="_blank"><img src="http://img.youtube.com/vi/DyQkdoPNsYY/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
+
+Note that the car successfully recovers from critical situations, even though no recovery events were recorded. All recovery events were generated synthetically by distorting the images of the car driving in the middle of the road, as described above. 
 
 # Conclusions
 By making consequent use of image augmentation with according steering angle updates we could train a neural network to recover the car from extreme events, like suddenly appearing curves change of lighting conditions by exclusively simulating such events from regular driving data. 
