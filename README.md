@@ -69,7 +69,17 @@ be proportional to shearing angle.
 
 
 # Epochs and Validation
-Initially we kept a validation set for checking against overfitting by comparing training and validation loss. However, after introduction of the generator and the corresponding rapid performance increase we eventually switched to testing the performance of the network by letting it drive on the test track. We used an Adam optimizer for training. All training was performed at the fastest graphics setting. 
+For validation purposes 10% of the training data (about 1000 images) was held back. 
+Only the center camera imags are used for validation. After few epochs (~10) the validation and training loss settle. The 
+validation loss is consistently about half of the training loss, which indicates
+underfitting, however with the caveat that training and validation data are not drawn from the same sample: 
+there is no data augmentation for the validation data.
+A more robust albeit non-automatic metric consists of checking the performance of 
+the network by letting it drive the car on the second track which was not used in training.
+
+We used an Adam optimizer for training. All training was performed at the fastest graphics setting. 
+
+
 
 # Results
 Surprisingly, the car went around the training track almost immediately after introducing the generator. However, it was not reactive enough to complete the test track. Tuning the parameters of the angle correction in the augmentation section of teh code and retraining the network for about 10 epochs fixed the issue and the car mastered the test track. A video of the test track performance is shown here. 
