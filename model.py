@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import os
+import sys
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 import cv2
@@ -25,19 +26,31 @@ training_dat = pd.read_csv(data_dir+data_csv,names=None)
 training_dat.head()
 
 
-
-# start with the center images only
-X_train = training_dat['center']
-X_left  = training_dat['left']
-X_right = training_dat['right']
+training_dat[['left','center','right']]
+X_train = training_dat[['left','center','right']]
 Y_train = training_dat['steering']
+
+X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, test_size=0.1, random_state=42)
+
+# get rid of the pandas index after shuffling
+X_left  = X_train['left'].as_matrix()
+X_right = X_train['right'].as_matrix()
+X_train = X_train['center'].as_matrix()
+X_val   = X_val['center'].as_matrix()
+Y_val   = Y_val.as_matrix()
+Y_train = Y_train.as_matrix()
+
 Y_train = Y_train.astype(np.float32)
+Y_val   = Y_val.astype(np.float32)
+
+
 if data_dir=='./data/udacity':
     X_train = X_train.apply(lambda x: data_dir+'/'+x)
     X_left = X_left.apply(lambda x: data_dir+'/'+x)
     X_right = X_right.apply(lambda x: data_dir+'/'+x)
-X_train.head(),Y_train.head()
 
+print('X_train[:5]: ',X_train[:5])
+print('Y_train[:5]: ',Y_train[:5])
 
 
 def read_next_image(m,lcr,X_train,X_left,X_right,Y_train):
@@ -46,7 +59,7 @@ def read_next_image(m,lcr,X_train,X_left,X_right,Y_train):
     # using tan(alpha)=alpha
 
     offset=1.0 
-    dist=10.0
+    dist=20.0
     steering = Y_train[m]
     if lcr == 0:
         image = plt.imread(X_left[m].replace(' ',''))
@@ -143,13 +156,15 @@ def generate_training_example(X_train,X_left,X_right,Y_train):
 #    plt.imshow(image)
     
     return image,steering
+
+def get_validation_set(X_val,Y_val):
+    X = np.zeros((len(X_val),64,64,3))
+    Y = np.zeros(len(X_val))
+    for i in range(len(X_val)):
+        x,y = read_next_image(i,1,X_val,X_val,X_val,Y_val)
+        X[i],Y[i] = random_crop(x,y,tx_lower=0,tx_upper=0,ty_lower=0,ty_upper=0)
+    return X,Y
     
-
-#image,steering = generate_training_example(X_train,X_left,X_right,Y_train)
-#plt.imshow(image)    
-#print('steering :',steering)
-
-
 
 def generate_train_batch(X_train,X_left,X_right,Y_train,batch_size = 32):
     
@@ -163,11 +178,15 @@ def generate_train_batch(X_train,X_left,X_right,Y_train,batch_size = 32):
         yield batch_images, batch_steering
 
 
+
 batch_size=200
 train_generator = generate_train_batch(X_train,X_left,X_right,Y_train,batch_size)
+X_val,Y_val = get_validation_set(X_val,Y_val)
 
 print('X_train data type :',X_train.dtype)
 print('Y_train data type :',Y_train.dtype)
+print('X_val data type :',X_val.dtype)
+print('Y_val data type :',Y_val.dtype)
 
 
 model = Sequential()
@@ -209,7 +228,7 @@ model.compile(optimizer=adam, loss='mse')
 nb_epoch=10
 history = model.fit_generator(train_generator,
                     samples_per_epoch=20000, nb_epoch=nb_epoch,
-                    verbose=1)
+                    validation_data=(X_val,Y_val),verbose=1)
 
 json_string = model.to_json()
 
