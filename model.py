@@ -62,13 +62,13 @@ def read_next_image(m,lcr,X_train,X_left,X_right,Y_train):
     dist=20.0
     steering = Y_train[m]
     if lcr == 0:
-        image = plt.imread(X_left[m].replace(' ',''))
+        image = plt.imread(X_left[m].strip(' '))
         dsteering = offset/dist * 360/( 2*np.pi) / 25.0
         steering += dsteering
     elif lcr == 1:
-        image = plt.imread(X_train[m].replace(' ',''))
+        image = plt.imread(X_train[m].strip(' '))
     elif lcr == 2:
-        image = plt.imread(X_right[m].replace(' ',''))
+        image = plt.imread(X_right[m].strip(' '))
         dsteering = -offset/dist * 360/( 2*np.pi)  / 25.0
         steering += dsteering
     else:
