@@ -47,9 +47,7 @@ However, the correct large steering angles are not easy to generate this way, be
 
 ## Model architecture
 CNNs architectures have been successfully used to predict the steering angle of the simulator. 
-Among these are the CNN architecture of NVIDIA https://arxiv.org/pdf/1604.07316v1.pdf or the comma.ai architecture 
-https://github.com/commaai/research which were used successfully, e.g. in the submission of https://github.com/diyjac/SDC-P3 and 
-https://github.com/diyjac/SDC-P3/.  In https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.4iywd3mzj the author provided a solution to this steering problem based on the judicious use of data augmentation. This submission draws on the insights obtained there but differs in the network architecture and augmentation techniques. 
+Among these are the [CNN architecture of NVIDIA](https://arxiv.org/pdf/1604.07316v1.pdf) or the [comma.ai architecture](https://github.com/commaai/research) which were used successfully, e.g. [this submission](https://github.com/diyjac/SDC-P3). In [this article](https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9#.4iywd3mzj) Vivek Yadav provided a solution to this steering problem based on the judicious use of data augmentation. This submission draws on the insights obtained there but differs in the network architecture and augmentation techniques. 
 
 In all of the above architectures a single variable -- the current steering angle -- is predicted as a real valued number. The problem is thus not a classification but a regression task.  We will build a similar architecture that predicts a single real valued number, but it would be interesting to see how a discretized version performs. 
 
