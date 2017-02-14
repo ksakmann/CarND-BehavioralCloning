@@ -1,6 +1,38 @@
 # CarND-BehavioralCloning
 In this project for the Udacity Self-Driving Car Nanodegree a deep CNN  is developed that can steer a car in a simulator provided by Udacity. The CNN drives the car autonomously around a track. The network is trained on images from a video stream that was recorded while a human was steering the car. The CNN thus clones the human driving behavior.
 
+
+#**Behavioral Cloning** 
+
+The goals / steps of this project are the following:
+* Use the simulator to collect data of good driving behavior
+* Build, a convolution neural network in Keras that predicts steering angles from images
+* Train and validate the model with a training and validation set
+* Test that the model successfully drives around track one without leaving the road
+* Summarize the results with a written report
+
+Please see the  [rubric points](https://review.udacity.com/#!/rubrics/432/view) for this project.   
+
+### Getting started
+
+The project includes the following files:
+* model.py containing the script to create and train the model
+* drive.py for driving the car in autonomous mode
+* model.h5 containing a trained convolution neural network 
+* this README.md 
+
+Additionally you need to download and unpack the [Udacity self-driving car simulator](https://github.com/udacity/self-driving-car-sim). To run the code start the simulator in `autonomous mode`, open another shell and type 
+
+```
+python drive.py model.h5
+```
+
+To train the model, first make a directory `./data/mydata`, drive the car in `training mode` around the track and save the data to this directory. The model is then trained by typing 
+```
+python model.py
+```
+The rest of this `README.md` provides details about the model used.
+
 # General considerations.
 The simulated car is equipped with three cameras, one to the left, one in the center and one to the right of the driver that provide images from these different view points. The training track has sharp corners, exits, entries, bridges, partially missing lane lines and changing light conditions. An additional test track exists with changing elevations, even sharper turns and bumps. It is thus crucial that the CNN does not merely memorize the first track, but generalizes to unseen data in order to perform well on the test track. The model developed here was trained exclusively on the training track and completes the test track.
 
